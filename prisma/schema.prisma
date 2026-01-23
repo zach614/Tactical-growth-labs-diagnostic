@@ -1,0 +1,69 @@
+// Prisma Schema for Tactical Growth Labs Diagnostic Tool
+// Database: SQLite (for MVP simplicity)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model DiagnosticSubmission {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Contact Information
+  firstName String
+  email     String
+  storeUrl  String
+
+  // Optional Business Context
+  monthlyRevenueRange String? // <50k, 50k-150k, 150k-500k, 500k+
+
+  // Raw Metrics (as submitted)
+  sessions30d      Int
+  orders30d        Int
+  conversionRate   Float // percentage (e.g., 2.3 means 2.3%)
+  aov              Float // average order value in dollars
+  cartAbandonRate  Float // percentage (e.g., 68.5 means 68.5%)
+
+  // Calculated Values
+  revenueEst        Float // estimated 30-day revenue
+  revenuePerSession Float // revenue per session
+
+  // Diagnostic Results
+  leakScore Int    // 0-100 score
+  topLeak1  String // primary identified leak
+  topLeak2  String // secondary identified leak
+
+  // Stored Output (for reference/audit)
+  teaserJson     String // JSON string of teaser results
+  fullReportHtml String // HTML content of full report
+
+  // Tracking Fields (for future analytics)
+  ipAddress   String?
+  userAgent   String?
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+
+  // Integration Status
+  emailSentAt     DateTime?
+  ownerNotifiedAt DateTime?
+  ghlSyncedAt     DateTime?
+
+  @@index([email])
+  @@index([createdAt])
+  @@index([leakScore])
+}
+
+// For admin session management (simple token-based)
+model AdminSession {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+}
