@@ -2,6 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Header from '@/components/Header';
+import FramingBand from '@/components/FramingBand';
+import VideoSection from '@/components/VideoSection';
+import TransitionBridge from '@/components/TransitionBridge';
 import Hero from '@/components/Hero';
 import ProofVideo from '@/components/ProofVideo';
 import DiagnosticIntro from '@/components/DiagnosticIntro';
@@ -42,7 +45,16 @@ export default function HomePage() {
       <Header />
 
       <main>
-        {/* Hero Section */}
+        {/* Section 0: Authority / Framing Band */}
+        <FramingBand />
+
+        {/* Section 1: Video - The "Why" */}
+        <VideoSection />
+
+        {/* Section 2: Transition / Bridge */}
+        <TransitionBridge />
+
+        {/* Section 3: Diagnostic Hero */}
         <Hero />
 
         {/* What This Is / What This Isn't */}

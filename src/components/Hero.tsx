@@ -1,6 +1,6 @@
 export default function Hero() {
   return (
-    <section className="pt-24 pb-16 sm:pt-32 sm:pb-20 bg-neutral-950">
+    <section className="py-16 sm:py-20 bg-neutral-950">
       <div className="section-container">
         <div className="max-w-3xl mx-auto text-center">
           {/* Badge */}
@@ -24,7 +24,7 @@ export default function Hero() {
 
           {/* Authority/credibility line */}
           <p className="text-sm text-neutral-500 max-w-xl mx-auto mb-8">
-            Based on the same diagnostic logic used to support a tactical gear store averaging 14.29x ROAS over 3+ years.
+            Based on the same diagnostic logic used to support a tactical gear store averaging $13.37 ROAS over 3+ years.
           </p>
 
           {/* CTAs */}
