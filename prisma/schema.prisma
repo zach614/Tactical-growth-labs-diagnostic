@@ -1,13 +1,14 @@
 // Prisma Schema for Tactical Growth Labs Diagnostic Tool
-// Database: SQLite (for MVP simplicity)
+// Database: Turso (libSQL - SQLite compatible cloud database)
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
+  url      = "file:./dev.db"
 }
 
 model DiagnosticSubmission {
