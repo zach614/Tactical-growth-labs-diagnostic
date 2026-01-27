@@ -147,23 +147,11 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('[API] Diagnostic submission error:', error);
 
-    // Return detailed error in development/debug mode
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    const errorStack = error instanceof Error ? error.stack : undefined;
-
+    // Don't expose internal errors to client
     return NextResponse.json(
       {
         success: false,
         error: 'An error occurred processing your request. Please try again.',
-        // Include debug info (remove in production if sensitive)
-        debug: {
-          message: errorMessage,
-          stack: errorStack,
-          hasTursoUrl: !!process.env.TURSO_DATABASE_URL,
-          hasTursoToken: !!process.env.TURSO_AUTH_TOKEN,
-          tursoUrlLength: process.env.TURSO_DATABASE_URL?.length,
-          tursoUrlStart: process.env.TURSO_DATABASE_URL?.substring(0, 50),
-        },
       },
       { status: 500 }
     );
