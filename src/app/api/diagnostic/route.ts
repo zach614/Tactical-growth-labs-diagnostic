@@ -161,6 +161,8 @@ export async function POST(request: NextRequest) {
           stack: errorStack,
           hasTursoUrl: !!process.env.TURSO_DATABASE_URL,
           hasTursoToken: !!process.env.TURSO_AUTH_TOKEN,
+          tursoUrlLength: process.env.TURSO_DATABASE_URL?.length,
+          tursoUrlStart: process.env.TURSO_DATABASE_URL?.substring(0, 50),
         },
       },
       { status: 500 }
