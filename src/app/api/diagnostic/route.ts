@@ -94,49 +94,41 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Send emails asynchronously (don't block response)
-    // Using Promise.allSettled to ensure we catch any errors
-    const emailPromise = sendAllEmails(
-      submission.id,
-      formData.email,
-      formData.firstName,
-      results
-    ).then(async (emailResults) => {
-      // Update submission with email status
-      const updates: Record<string, Date> = {};
-      if (emailResults.leadEmail.success) {
-        updates.emailSentAt = new Date();
-      }
-      if (emailResults.ownerEmail.success) {
-        updates.ownerNotifiedAt = new Date();
-      }
-      if (Object.keys(updates).length > 0) {
-        await prisma.diagnosticSubmission.update({
-          where: { id: submission.id },
-          data: updates,
-        });
-      }
-    }).catch((err) => {
-      console.error('[API] Email sending failed:', err);
-    });
+    // Send emails and GHL sync in parallel, but wait for completion
+    // On serverless (Vercel), we must await these before returning or they get terminated
+    const [emailResults, ghlResult] = await Promise.all([
+      sendAllEmails(submission.id, formData.email, formData.firstName, results)
+        .catch((err) => {
+          console.error('[API] Email sending failed:', err);
+          return { leadEmail: { success: false }, ownerEmail: { success: false } };
+        }),
+      sendToGHL(results)
+        .catch((err) => {
+          console.error('[API] GHL sync failed:', err);
+          return { success: false };
+        }),
+    ]);
 
-    // Send to GoHighLevel asynchronously (don't block response)
-    const ghlPromise = sendToGHL(results).then(async (ghlResult) => {
-      if (ghlResult.success) {
-        await prisma.diagnosticSubmission.update({
-          where: { id: submission.id },
-          data: { ghlSyncedAt: new Date() },
-        });
-      }
-    }).catch((err) => {
-      console.error('[API] GHL sync failed:', err);
-    });
+    // Update submission with integration status
+    const updates: Record<string, Date> = {};
+    if (emailResults.leadEmail.success) {
+      updates.emailSentAt = new Date();
+    }
+    if (emailResults.ownerEmail.success) {
+      updates.ownerNotifiedAt = new Date();
+    }
+    if (ghlResult.success) {
+      updates.ghlSyncedAt = new Date();
+    }
 
-    // Don't await - let them run in background
-    // This ensures the response is returned immediately
-    void Promise.allSettled([emailPromise, ghlPromise]);
+    if (Object.keys(updates).length > 0) {
+      await prisma.diagnosticSubmission.update({
+        where: { id: submission.id },
+        data: updates,
+      });
+    }
 
-    // Return teaser results immediately
+    // Return teaser results
     return NextResponse.json({
       success: true,
       submissionId: submission.id,
