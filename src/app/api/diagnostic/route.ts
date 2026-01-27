@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { diagnosticFormSchema, type DiagnosticFormData } from '@/lib/validation';
 import { runDiagnostic, generateTeaser, generateFullReport } from '@/lib/diagnostic';
 import { sendAllEmails } from '@/lib/email';
@@ -52,6 +52,9 @@ export async function POST(request: NextRequest) {
     const utmSource = url.searchParams.get('utm_source');
     const utmMedium = url.searchParams.get('utm_medium');
     const utmCampaign = url.searchParams.get('utm_campaign');
+
+    // Get Prisma client (lazy initialization for serverless)
+    const prisma = await getPrisma();
 
     // Persist to database
     const submission = await prisma.diagnosticSubmission.create({

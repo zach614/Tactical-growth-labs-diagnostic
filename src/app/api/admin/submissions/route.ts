@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 
 // Helper to verify admin token
 async function verifyToken(token: string | null): Promise<boolean> {
   if (!token) return false;
 
+  const prisma = await getPrisma();
   const session = await prisma.adminSession.findUnique({
     where: { token },
   });
@@ -24,6 +25,9 @@ export async function GET(request: NextRequest) {
         { status: 401 }
       );
     }
+
+    // Get Prisma client (lazy initialization for serverless)
+    const prisma = await getPrisma();
 
     // Fetch submissions, newest first
     const submissions = await prisma.diagnosticSubmission.findMany({

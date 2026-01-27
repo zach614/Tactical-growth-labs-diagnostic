@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
@@ -30,6 +30,9 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       );
     }
+
+    // Get Prisma client (lazy initialization for serverless)
+    const prisma = await getPrisma();
 
     // Generate session token
     const token = generateToken();

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 
 export async function POST(request: NextRequest) {
   try {
@@ -8,6 +8,9 @@ export async function POST(request: NextRequest) {
     if (!token) {
       return NextResponse.json({ valid: false }, { status: 401 });
     }
+
+    // Get Prisma client (lazy initialization for serverless)
+    const prisma = await getPrisma();
 
     // Check if token exists and is not expired
     const session = await prisma.adminSession.findUnique({
