@@ -13,14 +13,18 @@ async function createPrismaClientAsync(): Promise<PrismaClient> {
   const tursoAuthToken = process.env.TURSO_AUTH_TOKEN;
 
   if (tursoUrl && tursoAuthToken) {
-    // Dynamic import to avoid build-time initialization issues
-    const { PrismaLibSql } = await import('@prisma/adapter-libsql');
+    // Dynamic imports to avoid build-time initialization issues
+    const { createClient } = await import('@libsql/client');
+    const { PrismaLibSQL } = await import('@prisma/adapter-libsql');
 
-    // Use Turso/libSQL adapter for production
-    const adapter = new PrismaLibSql({
+    // Create libsql client
+    const libsql = createClient({
       url: tursoUrl,
       authToken: tursoAuthToken,
     });
+
+    // Use Turso/libSQL adapter for production
+    const adapter = new PrismaLibSQL(libsql);
 
     return new PrismaClient({
       adapter,
