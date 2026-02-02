@@ -141,8 +141,8 @@ export async function sendOwnerNotification(
         <td style="padding: 6px 0; text-align: right;">$${inputs.aov.toFixed(2)}</td>
       </tr>
       <tr>
-        <td style="padding: 6px 0; color: #6b7280;">Cart Abandon Rate</td>
-        <td style="padding: 6px 0; text-align: right;">${inputs.cartAbandonRate}%</td>
+        <td style="padding: 6px 0; color: #6b7280;">Abandoned Carts</td>
+        <td style="padding: 6px 0; text-align: right;">${inputs.abandonedCarts30d.toLocaleString()}</td>
       </tr>
     </table>
 
@@ -188,7 +188,7 @@ Metrics:
 - Orders (30d): ${inputs.orders30d.toLocaleString()}
 - Conversion Rate: ${inputs.conversionRate}%
 - AOV: $${inputs.aov.toFixed(2)}
-- Cart Abandon: ${inputs.cartAbandonRate}%
+- Abandoned Carts: ${inputs.abandonedCarts30d.toLocaleString()}
 
 Results:
 - Leak Score: ${leakScore}/100

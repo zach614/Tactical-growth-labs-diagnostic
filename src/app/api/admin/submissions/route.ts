@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
         orders30d: true,
         conversionRate: true,
         aov: true,
-        cartAbandonRate: true,
+        abandonedCarts30d: true,
         revenueEst: true,
         revenuePerSession: true,
         leakScore: true,

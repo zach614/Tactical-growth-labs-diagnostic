@@ -119,7 +119,7 @@ const LEAK_DEFINITIONS: Record<string, Omit<LeakDetail, 'impactScore'>> = {
     id: 'cart_medium',
     title: 'Cart Recovery Opportunity',
     description:
-      'Your cart abandonment is in the normal range but there\'s still significant revenue being left on the table.',
+      'You have more abandoned carts than completed orders — there\'s meaningful revenue being left on the table that recovery tactics can capture.',
     impact: 'medium',
     category: 'cart',
     checkFirst: [
@@ -164,13 +164,14 @@ function calculateLeakScore(data: DiagnosticFormData): number {
     score -= 8;
   }
 
-  // Cart Abandonment penalties
-  if (data.cartAbandonRate > 75) {
+  // Cart Abandonment penalties (relative to orders)
+  // High: abandonedCarts > orders * 2
+  // Moderate: abandonedCarts > orders
+  // Lower: abandonedCarts <= orders
+  if (data.abandonedCarts30d > data.orders30d * 2) {
     score -= 20;
-  } else if (data.cartAbandonRate > 65) {
+  } else if (data.abandonedCarts30d > data.orders30d) {
     score -= 12;
-  } else if (data.cartAbandonRate > 55) {
-    score -= 6;
   }
 
   // AOV penalties
@@ -212,13 +213,11 @@ function identifyLeaks(data: DiagnosticFormData): LeakDetail[] {
     leaks.push({ ...LEAK_DEFINITIONS.conversion_medium, impactScore: 8 });
   }
 
-  // Check cart abandonment
-  if (data.cartAbandonRate > 75) {
+  // Check cart abandonment (relative to orders)
+  if (data.abandonedCarts30d > data.orders30d * 2) {
     leaks.push({ ...LEAK_DEFINITIONS.high_cart_abandon, impactScore: 20 });
-  } else if (data.cartAbandonRate > 65) {
-    leaks.push({ ...LEAK_DEFINITIONS.high_cart_abandon, impactScore: 12 });
-  } else if (data.cartAbandonRate > 55) {
-    leaks.push({ ...LEAK_DEFINITIONS.cart_medium, impactScore: 6 });
+  } else if (data.abandonedCarts30d > data.orders30d) {
+    leaks.push({ ...LEAK_DEFINITIONS.cart_medium, impactScore: 12 });
   }
 
   // Check AOV
@@ -474,8 +473,8 @@ export function generateFullReport(results: DiagnosticResults, calendarUrl: stri
         <td style="padding: 8px 0; text-align: right; font-weight: 500;">$${inputs.aov.toFixed(2)}</td>
       </tr>
       <tr>
-        <td style="padding: 8px 0; color: #6b7280;">Cart Abandonment</td>
-        <td style="padding: 8px 0; text-align: right; font-weight: 500;">${inputs.cartAbandonRate}%</td>
+        <td style="padding: 8px 0; color: #6b7280;">Abandoned Carts</td>
+        <td style="padding: 8px 0; text-align: right; font-weight: 500;">${inputs.abandonedCarts30d.toLocaleString()}</td>
       </tr>
       <tr style="border-top: 1px solid #e5e7eb;">
         <td style="padding: 12px 0 8px 0; color: #374151; font-weight: 600;">Est. Monthly Revenue</td>
@@ -584,7 +583,7 @@ Sessions: ${inputs.sessions30d.toLocaleString()}
 Orders: ${inputs.orders30d.toLocaleString()}
 Conversion Rate: ${inputs.conversionRate}%
 Average Order Value: $${inputs.aov.toFixed(2)}
-Cart Abandonment: ${inputs.cartAbandonRate}%
+Abandoned Carts: ${inputs.abandonedCarts30d.toLocaleString()}
 
 Estimated Monthly Revenue: $${revenueEst.toLocaleString()}
 Revenue per Session: $${revenuePerSession.toFixed(2)}

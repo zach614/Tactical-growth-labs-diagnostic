@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
         orders30d: formData.orders30d,
         conversionRate: formData.conversionRate,
         aov: formData.aov,
-        cartAbandonRate: formData.cartAbandonRate,
+        abandonedCarts30d: formData.abandonedCarts30d,
 
         // Calculated values
         revenueEst: results.revenueEst,
@@ -168,7 +168,7 @@ export async function GET() {
       'orders30d',
       'conversionRate',
       'aov',
-      'cartAbandonRate',
+      'abandonedCarts30d',
     ],
     optionalFields: ['monthlyRevenueRange'],
   });
