@@ -141,6 +141,13 @@ export default function DiagnosticForm({ onSubmitSuccess }: DiagnosticFormProps)
       const data = await response.json();
 
       if (!response.ok) {
+        // Show specific field errors if available
+        if (data.details) {
+          const fieldErrors = Object.entries(data.details)
+            .map(([field, errors]) => `${field}: ${(errors as string[]).join(', ')}`)
+            .join('; ');
+          throw new Error(fieldErrors || data.error || 'Something went wrong');
+        }
         throw new Error(data.error || 'Something went wrong');
       }
 
