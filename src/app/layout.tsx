@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import './globals.css';
+
+const GA_MEASUREMENT_ID = 'G-8KZD15BWFT';
 
 export const metadata: Metadata = {
   title: 'Tactical Growth Labs | Revenue Leak Diagnostic for Tactical Gear Stores',
@@ -48,6 +51,19 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-stone-50 text-stone-900 antialiased">
+        {/* Google Analytics */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_MEASUREMENT_ID}');
+          `}
+        </Script>
         {children}
       </body>
     </html>
