@@ -19,10 +19,10 @@ function normalizeStoreUrl(url: string): string {
 
 // Monthly revenue range options
 export const REVENUE_RANGES = [
-  { value: '<50k', label: 'Under $50k/month' },
+  { value: 'under-50k', label: 'Under $50k/month' },
   { value: '50k-150k', label: '$50k – $150k/month' },
   { value: '150k-500k', label: '$150k – $500k/month' },
-  { value: '500k+', label: '$500k+/month' },
+  { value: '500k-plus', label: '$500k+/month' },
 ] as const;
 
 export type RevenueRange = typeof REVENUE_RANGES[number]['value'];
@@ -79,13 +79,13 @@ export const diagnosticFormSchema = z.object({
     .min(0, 'AOV cannot be negative')
     .max(5000, 'AOV cannot exceed $5,000'),
 
-  cartAbandonRate: z
-    .number({ invalid_type_error: 'Cart abandonment rate must be a number' })
-    .min(0, 'Cart abandonment rate cannot be negative')
-    .max(100, 'Cart abandonment rate cannot exceed 100%'),
+  abandonedCarts30d: z
+    .number({ invalid_type_error: 'Abandoned carts must be a number' })
+    .int('Abandoned carts must be a whole number')
+    .min(0, 'Abandoned carts cannot be negative'),
 
   monthlyRevenueRange: z
-    .enum(['<50k', '50k-150k', '150k-500k', '500k+'])
+    .enum(['under-50k', '50k-150k', '150k-500k', '500k-plus'])
     .optional()
     .nullable(),
 });
@@ -124,11 +124,10 @@ export const fieldValidators = {
     return null;
   },
 
-  cartAbandonRate: (value: string): string | null => {
-    const num = parseFloat(value);
+  abandonedCarts30d: (value: string): string | null => {
+    const num = parseInt(value, 10);
     if (isNaN(num)) return 'Please enter a valid number';
-    if (num < 0) return 'Rate cannot be negative';
-    if (num > 100) return 'Rate cannot exceed 100%';
+    if (num < 0) return 'Abandoned carts cannot be negative';
     return null;
   },
 };
