@@ -11,7 +11,7 @@ const faqs: FAQItem[] = [
   {
     question: 'What metrics do I need to run the diagnostic?',
     answer:
-      'You\'ll need 5 metrics from your Shopify Analytics (last 30 days): Sessions, Orders, Conversion Rate, Average Order Value, and Cart Abandonment Rate. Each field in the form includes instructions on exactly where to find these numbers in your Shopify admin.',
+      'You\'ll need 5 metrics from your Shopify Analytics (last 30 days): Sessions, Orders, Conversion Rate, Average Order Value, and Abandoned Carts. Each field in the form includes instructions on exactly where to find these numbers in your Shopify admin.',
   },
   {
     question: 'How accurate is the leak score?',
@@ -43,35 +43,38 @@ export default function FAQ() {
   };
 
   return (
-    <section className="py-16 sm:py-20 bg-neutral-900">
+    <section className="py-5 sm:py-8 md:py-12 bg-neutral-950">
       <div className="section-container">
-        <div className="max-w-3xl mx-auto">
+        {/* Divider above */}
+        <div className="section-divider mb-4 sm:mb-8" />
+
+        <div className="max-w-2xl mx-auto">
           {/* Section header */}
-          <div className="text-center mb-10">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+          <div className="text-center mb-4 sm:mb-8">
+            <h2 className="text-base sm:text-lg md:text-xl font-bold text-white mb-1.5 sm:mb-3">
               Frequently Asked Questions
             </h2>
-            <p className="text-neutral-400">
-              Everything you need to know about the diagnostic tool.
+            <p className="text-xs sm:text-sm text-neutral-400">
+              Everything you need to know about the diagnostic.
             </p>
           </div>
 
           {/* FAQ items */}
-          <div className="space-y-3">
+          <div className="space-y-1.5 sm:space-y-2">
             {faqs.map((faq, index) => (
               <div
                 key={index}
-                className="border border-neutral-800 rounded-lg overflow-hidden bg-neutral-900"
+                className="border border-white/[0.06] rounded-lg overflow-hidden"
               >
                 <button
                   onClick={() => toggle(index)}
-                  className="w-full flex items-center justify-between p-5 text-left hover:bg-neutral-800/50 transition-colors"
+                  className="w-full flex items-center justify-between p-2.5 sm:p-4 text-left hover:bg-neutral-800/50 transition-colors"
                 >
-                  <span className="font-medium text-white pr-4">
+                  <span className="font-medium text-white pr-3 text-xs sm:text-sm">
                     {faq.question}
                   </span>
                   <svg
-                    className={`w-5 h-5 text-neutral-500 flex-shrink-0 transition-transform ${
+                    className={`w-3.5 h-3.5 sm:w-4 sm:h-4 text-neutral-500 flex-shrink-0 transition-transform ${
                       openIndex === index ? 'rotate-180' : ''
                     }`}
                     fill="none"
@@ -93,7 +96,7 @@ export default function FAQ() {
                       : 'max-h-0 opacity-0'
                   }`}
                 >
-                  <p className="px-5 pb-5 text-neutral-400">{faq.answer}</p>
+                  <p className="px-2.5 sm:px-4 pb-2.5 sm:pb-4 text-neutral-400 text-2xs sm:text-xs md:text-sm">{faq.answer}</p>
                 </div>
               </div>
             ))}

@@ -21,9 +21,9 @@ const SHOPIFY_INSTRUCTIONS: Record<string, { path: string; note?: string }> = {
     path: 'Analytics → Overview → Last 30 days → "Average order value"',
     note: 'Enter the dollar amount without the $ sign',
   },
-  cartAbandonRate: {
-    path: 'Analytics → Reports → "Sessions by checkout completion" or calculate: (Carts - Orders) / Carts × 100',
-    note: 'Industry average is 65-75%',
+  abandonedCarts30d: {
+    path: 'Shopify Admin → Analytics → Dashboards or Reports → Search "Abandoned carts" → Set date range to last 30 days → Use total abandoned carts.',
+    note: 'Exact labels vary by Shopify plan. Use the closest matching total.',
   },
 };
 
@@ -41,7 +41,7 @@ export default function DiagnosticForm({ onSubmitSuccess }: DiagnosticFormProps)
     orders30d: '',
     conversionRate: '',
     aov: '',
-    cartAbandonRate: '',
+    abandonedCarts30d: '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -100,9 +100,9 @@ export default function DiagnosticForm({ onSubmitSuccess }: DiagnosticFormProps)
       newErrors.aov = 'Please enter an amount between 0 and 5000';
     }
 
-    const cartAbandon = parseFloat(formData.cartAbandonRate);
-    if (isNaN(cartAbandon) || cartAbandon < 0 || cartAbandon > 100) {
-      newErrors.cartAbandonRate = 'Please enter a rate between 0 and 100';
+    const abandonedCarts = parseInt(formData.abandonedCarts30d, 10);
+    if (isNaN(abandonedCarts) || abandonedCarts < 0) {
+      newErrors.abandonedCarts30d = 'Please enter a valid number';
     }
 
     setErrors(newErrors);
@@ -134,7 +134,7 @@ export default function DiagnosticForm({ onSubmitSuccess }: DiagnosticFormProps)
           orders30d: parseInt(formData.orders30d, 10),
           conversionRate: parseFloat(formData.conversionRate),
           aov: parseFloat(formData.aov),
-          cartAbandonRate: parseFloat(formData.cartAbandonRate),
+          abandonedCarts30d: parseInt(formData.abandonedCarts30d, 10),
         }),
       });
 
@@ -166,14 +166,14 @@ export default function DiagnosticForm({ onSubmitSuccess }: DiagnosticFormProps)
     const isExpanded = expandedHelper === field;
 
     return (
-      <div className="mt-1.5">
+      <div className="mt-1">
         <button
           type="button"
           onClick={() => toggleHelper(field)}
-          className="accordion-trigger"
+          className="accordion-trigger text-2xs sm:text-xs"
         >
           <svg
-            className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+            className={`w-2.5 h-2.5 sm:w-3 sm:h-3 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -185,17 +185,17 @@ export default function DiagnosticForm({ onSubmitSuccess }: DiagnosticFormProps)
               d="M9 5l7 7-7 7"
             />
           </svg>
-          Where to find this in Shopify
+          Where to find in Shopify
         </button>
         <div
           className={`accordion-content ${
-            isExpanded ? 'max-h-40 opacity-100 mt-2' : 'max-h-0 opacity-0'
+            isExpanded ? 'max-h-40 opacity-100 mt-1.5' : 'max-h-0 opacity-0'
           }`}
         >
-          <div className="text-xs bg-neutral-800 rounded-md p-3 border border-neutral-700">
-            <code className="block text-accent-400 mb-1 font-mono">{instruction.path}</code>
+          <div className="text-2xs sm:text-xs bg-neutral-800 rounded-md p-2 sm:p-2.5 border border-neutral-700">
+            <code className="block text-accent-400 mb-0.5 font-mono text-2xs sm:text-xs">{instruction.path}</code>
             {instruction.note && (
-              <p className="text-neutral-500 italic">{instruction.note}</p>
+              <p className="text-neutral-500 italic text-2xs">{instruction.note}</p>
             )}
           </div>
         </div>
@@ -204,17 +204,17 @@ export default function DiagnosticForm({ onSubmitSuccess }: DiagnosticFormProps)
   };
 
   return (
-    <section className="pb-16 sm:pb-20 bg-neutral-950">
-      <div className="section-container">
+    <section className="pb-6 sm:pb-10 md:pb-16 bg-neutral-950">
+      <div className="section-container px-3 sm:px-4 md:px-6 lg:px-8">
         <div className="max-w-2xl mx-auto">
           {/* Form */}
-          <form onSubmit={handleSubmit} className="card-elevated">
+          <form onSubmit={handleSubmit} className="card-elevated p-3 sm:p-5">
             {/* Contact Information */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-white mb-4 pb-3 border-b border-neutral-800">
+            <div className="mb-4 sm:mb-6">
+              <h3 className="text-sm sm:text-base font-semibold text-white mb-2.5 sm:mb-3 pb-2 border-b border-neutral-800">
                 Your Information
               </h3>
-              <div className="grid sm:grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-2 gap-2.5 sm:gap-3">
                 <div>
                   <label htmlFor="firstName" className="form-label">
                     First Name *
@@ -249,7 +249,7 @@ export default function DiagnosticForm({ onSubmitSuccess }: DiagnosticFormProps)
                 </div>
               </div>
 
-              <div className="mt-4">
+              <div className="mt-2.5 sm:mt-3">
                 <label htmlFor="storeUrl" className="form-label">
                   Store URL *
                 </label>
@@ -260,16 +260,16 @@ export default function DiagnosticForm({ onSubmitSuccess }: DiagnosticFormProps)
                   value={formData.storeUrl}
                   onChange={handleChange}
                   className={errors.storeUrl ? 'form-input-error' : 'form-input'}
-                  placeholder="mystore.com or mystore.myshopify.com"
+                  placeholder="mystore.com"
                 />
                 {errors.storeUrl && (
                   <p className="form-error">{errors.storeUrl}</p>
                 )}
               </div>
 
-              <div className="mt-4">
+              <div className="mt-2.5 sm:mt-3">
                 <label htmlFor="monthlyRevenueRange" className="form-label">
-                  Monthly Revenue Range{' '}
+                  Revenue Range{' '}
                   <span className="text-neutral-500 font-normal">(optional)</span>
                 </label>
                 <select
@@ -290,12 +290,12 @@ export default function DiagnosticForm({ onSubmitSuccess }: DiagnosticFormProps)
             </div>
 
             {/* Shopify Metrics */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-white mb-4 pb-3 border-b border-neutral-800">
+            <div className="mb-4 sm:mb-6">
+              <h3 className="text-sm sm:text-base font-semibold text-white mb-2.5 sm:mb-3 pb-2 border-b border-neutral-800">
                 Shopify Metrics (Last 30 Days)
               </h3>
 
-              <div className="grid sm:grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-2 gap-2.5 sm:gap-3">
                 <div>
                   <label htmlFor="sessions30d" className="form-label">
                     Sessions *
@@ -379,39 +379,38 @@ export default function DiagnosticForm({ onSubmitSuccess }: DiagnosticFormProps)
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label htmlFor="cartAbandonRate" className="form-label">
-                    Cart Abandonment Rate (%) *
+                  <label htmlFor="abandonedCarts30d" className="form-label">
+                    Abandoned Carts (Last 30 Days) *
                   </label>
                   <input
                     type="number"
-                    id="cartAbandonRate"
-                    name="cartAbandonRate"
-                    value={formData.cartAbandonRate}
+                    id="abandonedCarts30d"
+                    name="abandonedCarts30d"
+                    value={formData.abandonedCarts30d}
                     onChange={handleChange}
-                    className={errors.cartAbandonRate ? 'form-input-error' : 'form-input'}
-                    placeholder="e.g., 68.5"
-                    step="0.1"
+                    className={errors.abandonedCarts30d ? 'form-input-error' : 'form-input'}
+                    placeholder="e.g., 450"
                     min="0"
-                    max="100"
                   />
-                  {errors.cartAbandonRate && (
-                    <p className="form-error">{errors.cartAbandonRate}</p>
+                  <p className="text-2xs sm:text-xs text-neutral-500 mt-0.5">Carts started but not completed</p>
+                  {errors.abandonedCarts30d && (
+                    <p className="form-error">{errors.abandonedCarts30d}</p>
                   )}
-                  {renderShopifyHelper('cartAbandonRate')}
+                  {renderShopifyHelper('abandonedCarts30d')}
                 </div>
               </div>
             </div>
 
             {/* Submit error */}
             {submitError && (
-              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-md text-red-400 text-sm">
+              <div className="mb-3 sm:mb-4 p-2.5 sm:p-3 bg-red-500/10 border border-red-500/30 rounded-md text-red-400 text-2xs sm:text-xs">
                 {submitError}
               </div>
             )}
 
             {/* Pre-submit micro-copy */}
-            <p className="text-center text-xs text-neutral-500 mb-4">
-              You&apos;ll see your teaser instantly. Full report is emailed.
+            <p className="text-center text-2xs sm:text-xs text-neutral-500 mb-2.5 sm:mb-3">
+              See teaser instantly. Full report emailed.
             </p>
 
             {/* Submit button */}
@@ -450,7 +449,7 @@ export default function DiagnosticForm({ onSubmitSuccess }: DiagnosticFormProps)
             </button>
 
             {/* Privacy note */}
-            <p className="text-center text-xs text-neutral-500 mt-4">
+            <p className="text-center text-2xs sm:text-xs text-neutral-500 mt-2.5 sm:mt-3">
               Your data is secure and never shared.
             </p>
           </form>

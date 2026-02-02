@@ -109,6 +109,17 @@
     @apply max-w-5xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 
+  /* Section container - narrow variant (matches form width) */
+  .section-container-narrow {
+    @apply max-w-3xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Subtle bordered container for major sections */
+  .section-card {
+    @apply rounded-lg border border-white/[0.06] p-4 sm:p-6;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15), 0 0 40px rgba(0, 0, 0, 0.05);
+  }
+
   /* Score badges */
   .score-badge {
     @apply inline-flex items-center px-3 py-1.5 rounded-md font-semibold text-sm;
@@ -139,6 +150,11 @@
   /* Divider */
   .divider {
     @apply border-t border-neutral-800;
+  }
+
+  /* Section divider - consistent thin rule for page breaks */
+  .section-divider {
+    @apply w-full max-w-xs mx-auto border-t border-neutral-800/60;
   }
 
   /* Highlight box */
