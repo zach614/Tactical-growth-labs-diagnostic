@@ -29,7 +29,7 @@ model DiagnosticSubmission {
   orders30d        Int
   conversionRate   Float // percentage (e.g., 2.3 means 2.3%)
   aov              Float // average order value in dollars
-  cartAbandonRate  Float // percentage (e.g., 68.5 means 68.5%)
+  abandonedCarts30d Int   // number of abandoned carts in last 30 days
 
   // Calculated Values
   revenueEst        Float // estimated 30-day revenue
