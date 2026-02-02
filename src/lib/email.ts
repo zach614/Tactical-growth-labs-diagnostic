@@ -17,6 +17,7 @@ const mg = MAILGUN_API_KEY
   ? mailgun.client({
       username: 'api',
       key: MAILGUN_API_KEY,
+      url: 'https://api.mailgun.net', // US region
     })
   : null;
 
@@ -61,6 +62,7 @@ export async function sendReportToLead(
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error(`[Email] Failed to send report to ${email}:`, errorMessage);
+    console.error(`[Email] Full error:`, error);
     return { success: false, error: errorMessage };
   }
 }
@@ -213,6 +215,7 @@ View submission: ${adminUrl}
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error(`[Email] Failed to send owner notification:`, errorMessage);
+    console.error(`[Email] Full error:`, error);
     return { success: false, error: errorMessage };
   }
 }
