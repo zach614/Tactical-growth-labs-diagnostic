@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Script from 'next/script';
 import './globals.css';
 
-const GA_MEASUREMENT_ID = 'G-8KZD15BWFT';
+const GA_MEASUREMENT_ID = 'G-KBMHRH5GDZ';
 
 export const metadata: Metadata = {
   title: 'Tactical Growth Labs | Revenue Leak Diagnostic for Tactical Gear Stores',
