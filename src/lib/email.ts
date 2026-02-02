@@ -1,17 +1,24 @@
-import sgMail from '@sendgrid/mail';
+import Mailgun from 'mailgun.js';
+import formData from 'form-data';
 import type { DiagnosticResults } from './diagnostic';
 import { generateFullReport, generateFullReportText } from './diagnostic';
 
-// Initialize SendGrid with API key
-const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
+// Initialize Mailgun
+const MAILGUN_API_KEY = process.env.MAILGUN_API_KEY;
+const MAILGUN_DOMAIN = process.env.MAILGUN_DOMAIN;
 const FROM_EMAIL = process.env.FROM_EMAIL || 'hello@tacticalgrowthlabs.com';
 const OWNER_NOTIFY_EMAIL = process.env.OWNER_NOTIFY_EMAIL;
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 const CALENDAR_URL = process.env.CALENDAR_URL || '#';
 
-if (SENDGRID_API_KEY) {
-  sgMail.setApiKey(SENDGRID_API_KEY);
-}
+// Create Mailgun client
+const mailgun = new Mailgun(formData);
+const mg = MAILGUN_API_KEY
+  ? mailgun.client({
+      username: 'api',
+      key: MAILGUN_API_KEY,
+    })
+  : null;
 
 // ============================================================================
 // EMAIL SENDING FUNCTIONS
@@ -32,27 +39,23 @@ export async function sendReportToLead(
   firstName: string,
   results: DiagnosticResults
 ): Promise<EmailResult> {
-  if (!SENDGRID_API_KEY) {
-    console.warn('[Email] SendGrid API key not configured - skipping lead email');
-    return { success: false, error: 'SendGrid not configured' };
+  if (!mg || !MAILGUN_DOMAIN) {
+    console.warn('[Email] Mailgun not configured - skipping lead email');
+    return { success: false, error: 'Mailgun not configured' };
   }
 
   try {
     const htmlContent = generateFullReport(results, CALENDAR_URL);
     const textContent = generateFullReportText(results, CALENDAR_URL);
 
-    const msg = {
-      to: email,
-      from: {
-        email: FROM_EMAIL,
-        name: 'Tactical Growth Labs',
-      },
+    await mg.messages.create(MAILGUN_DOMAIN, {
+      from: `Tactical Growth Labs <${FROM_EMAIL}>`,
+      to: [email],
       subject: `${firstName}, Your Revenue Leak Diagnostic Report`,
       text: textContent,
       html: htmlContent,
-    };
+    });
 
-    await sgMail.send(msg);
     console.log(`[Email] Report sent successfully to ${email}`);
     return { success: true };
   } catch (error) {
@@ -70,9 +73,9 @@ export async function sendOwnerNotification(
   submissionId: string,
   results: DiagnosticResults
 ): Promise<EmailResult> {
-  if (!SENDGRID_API_KEY) {
-    console.warn('[Email] SendGrid API key not configured - skipping owner notification');
-    return { success: false, error: 'SendGrid not configured' };
+  if (!mg || !MAILGUN_DOMAIN) {
+    console.warn('[Email] Mailgun not configured - skipping owner notification');
+    return { success: false, error: 'Mailgun not configured' };
   }
 
   if (!OWNER_NOTIFY_EMAIL) {
@@ -197,18 +200,14 @@ Results:
 View submission: ${adminUrl}
     `.trim();
 
-    const msg = {
-      to: OWNER_NOTIFY_EMAIL,
-      from: {
-        email: FROM_EMAIL,
-        name: 'TGL Diagnostic Tool',
-      },
+    await mg.messages.create(MAILGUN_DOMAIN, {
+      from: `TGL Diagnostic Tool <${FROM_EMAIL}>`,
+      to: [OWNER_NOTIFY_EMAIL],
       subject: `🎯 New Lead: ${inputs.firstName} (${inputs.storeUrl.replace('https://', '')}) - Score: ${leakScore}`,
       text: textContent,
       html: htmlContent,
-    };
+    });
 
-    await sgMail.send(msg);
     console.log(`[Email] Owner notification sent for submission ${submissionId}`);
     return { success: true };
   } catch (error) {
